@@ -18,4 +18,5 @@
 # Other ignores
 .DS_Store
 .secret
+database.yml
 
