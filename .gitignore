@@ -10,6 +10,7 @@
 # Ignore the default SQLite database.
 /db/*.sqlite3
 /db/*.sqlite3-journal
+/db/*.stat
 
 # Ignore all logfiles and tempfiles.
 /log/*.log
@@ -19,4 +20,5 @@
 .DS_Store
 .secret
 database.yml
+
 
