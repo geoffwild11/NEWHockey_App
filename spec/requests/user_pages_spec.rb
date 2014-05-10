@@ -29,6 +29,67 @@ describe "UserPages" do
       it "should not create a user" do
         expect { click_button submit }.not_to change(User, :count)
       end
+
+      describe "after submission" do
+        before { click_button submit }
+
+        it { should have_title(full_title("Sign Up")) }
+        it { should have_content('error') }
+
+        describe "with blank name" do
+          before { fill_in "Name", with: " " }
+
+          it { should have_content("* Name can't be blank") }
+        end
+
+        describe "with blank email" do
+          before { fill_in "Email", with: " " }
+
+          it { should have_content("* Email can't be blank") }
+          it { should have_content("* Email is invalid")}
+        end
+
+        describe "with invalid email" do
+          before { fill_in "Email", with: "foobar@invalid" }
+
+          it { should have_content("* Email is invalid") }
+        end
+
+        describe "with blank password" do
+          before { fill_in "Password", with: " " }
+
+          it { should have_content("* Password can't be blank") }
+          it { should have_content("* Password is too short") }
+        end
+
+        describe "with too short password" do
+          before { fill_in "Password", with: "badpw" }
+
+          it { should have_content("* Password is too short") }
+        end
+
+        describe "with blank password confirmation" do
+          before do
+            fill_in "Password", with: "foobar"
+            fill_in "Confirmation", with: " "
+            click_button submit
+          end
+
+          it { should have_content("* Password confirmation can't be blank")}
+        end
+
+        describe "with mismatching Password and Confirmation" do
+          before do
+            fill_in "Name",     with: "Example User"
+            fill_in "Email",    with: "user@example.com"
+            fill_in "Password", with: "foobar"
+            fill_in "Confirmation", with: "mismatch"
+            click_button submit
+          end
+
+          it { should have_content("* Password confirmation doesn't match Password") }
+        end
+      end
     end
 
   	describe "with valid information" do
@@ -38,6 +99,14 @@ describe "UserPages" do
   			fill_in "Password",		with: "foobar"
   			fill_in "Confirmation",	with: "foobar"
   		end
+
+      describe "after saving the user" do
+        before { click_button submit }
+        let(:user) { User.find_by(email: "user@example.com") }
+
+        it { should have_title(user.name) }
+        it { should have_selector('div.alert.alert-success', text: 'Welcome') }
+      end
 
   		it "should create a user" do
   			expect { click_button submit }.to change(User, :count).by(1)
